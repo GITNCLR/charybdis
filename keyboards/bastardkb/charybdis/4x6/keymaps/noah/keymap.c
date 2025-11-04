@@ -142,7 +142,7 @@ void matrix_scan_user(void) {
         layer_off(LAYER_POINTER);
 #        ifdef RGB_MATRIX_ENABLE
             rgb_matrix_mode_noeeprom(RGB_MATRIX_DEFAULT_MODE);
-            rgb_matrix_sethsv_noeeprom(HSV_RED)
+            rgb_matrix_sethsv_noeeprom(HSV_RED);
 #        endif // RGB_MATRIX_ENABLE
     }
 }
