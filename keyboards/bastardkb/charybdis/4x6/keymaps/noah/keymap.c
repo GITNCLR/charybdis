@@ -102,8 +102,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-#ifdef POINTING_DEVICE_ENABLE
 
+#if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
+void pointing_device_init_user(void) {
+    set_auto_mouse_layer(LAYER_POINTER);  // use your pointer layer
+    set_auto_mouse_enable(true);          // MUST be enabled to work
+}
+#endif
+
+#ifdef POINTING_DEVICE_ENABLE
 
 #    ifdef CHARYBDIS_AUTO_SNIPING_ON_LAYER
 layer_state_t layer_state_set_user(layer_state_t state) {
