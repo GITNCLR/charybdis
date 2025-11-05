@@ -17,10 +17,25 @@
 #pragma once
 
 // --- Brightness cap ---
+#ifdef RGBLIGHT_LIMIT_VAL
+#    undef RGBLIGHT_LIMIT_VAL
+#endif
+#define RGBLIGHT_LIMIT_VAL 150
+
+#ifdef LED_MATRIX_MAXIMUM_BRIGHTNESS
+#    undef LED_MATRIX_MAXIMUM_BRIGHTNESS
+#endif
+#define LED_MATRIX_MAXIMUM_BRIGHTNESS 150
+
+#ifdef LED_MATRIX_DEFAULT_VAL
+#    undef LED_MATRIX_DEFAULT_VAL
+#endif
+#define LED_MATRIX_DEFAULT_VAL LED_MATRIX_MAXIMUM_BRIGHTNESS
+
 #ifdef RGB_MATRIX_MAXIMUM_BRIGHTNESS
 #    undef RGB_MATRIX_MAXIMUM_BRIGHTNESS
 #endif
-#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 200
+#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150
 
 // --- Default mode/color (solid red) ---
 #ifdef RGB_MATRIX_DEFAULT_MODE
@@ -61,11 +76,6 @@
 /* Charybdis-specific features. */
 
 #ifdef POINTING_DEVICE_ENABLE
-// Automatically enable the pointer layer when moving the trackball.  See also:
-// - `CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_TIMEOUT_MS`
-// - `CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_THRESHOLD`
-// #define CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_ENABLE
-#endif // POINTING_DEVICE_ENABLE
-
-#define POINTING_DEVICE_AUTO_MOUSE_ENABLE
 // Enable automatic mouse movement when on the pointer layer.
+#    define POINTING_DEVICE_AUTO_MOUSE_ENABLE
+#endif // POINTING_DEVICE_ENABLE

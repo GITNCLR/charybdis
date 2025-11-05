@@ -24,7 +24,7 @@ enum charybdis_keymap_layers {
 };
 
 /** \brief Automatically enable sniping-mode on the pointer layer. */
-#define CHARYBDIS_AUTO_SNIPING_ON_LAYER LAYER_POINTER
+// #define CHARYBDIS_AUTO_SNIPING_ON_LAYER LAYER_POINTER
 
 #define LOWER MO(LAYER_LOWER)
 #define RAISE MO(LAYER_RAISE)
@@ -102,13 +102,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-#if defined(POINTING_DEVICE_ENABLE) && defined(POINTING_DEVICE_AUTO_MOUSE_ENABLE)
-void pointing_device_init_user(void) {
-    set_auto_mouse_layer(LAYER_POINTER); // use your pointer layer
-    set_auto_mouse_enable(true);         // MUST be enabled to work
-}
-#endif
-
 #ifdef POINTING_DEVICE_ENABLE
 
 #    ifdef CHARYBDIS_AUTO_SNIPING_ON_LAYER
@@ -117,7 +110,15 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 #    endif // CHARYBDIS_AUTO_SNIPING_ON_LAYER
-#endif     // POINTING_DEVICE_ENABLE
+
+#    ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+void pointing_device_init_user(void) {
+    set_auto_mouse_layer(LAYER_POINTER); // use your pointer layer
+    set_auto_mouse_enable(true);         // MUST be enabled to work
+}
+#    endif // POINTING_DEVICE_AUTO_MOUSE_ENABLE
+
+#endif // POINTING_DEVICE_ENABLE
 
 #ifdef RGB_MATRIX_ENABLE
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
@@ -135,11 +136,10 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         }
 
         // Return true to fully override the active RGB effect with solid white.
-        // If you'd rather let the running effect keep animating, return false.
         return true;
     } else if (top == LAYER_LOWER) {
-        // Deep purple = hue 200°, full saturation, keep current brightness
-        hsv_t hsv = {.h = 200, .s = 255, .v = rgb_matrix_get_val()};
+        // Green = hue 85°, full saturation, keep current brightness
+        hsv_t hsv = {.h = 85, .s = 255, .v = rgb_matrix_get_val()};
         rgb_t rgb = hsv_to_rgb(hsv);
 
         for (uint8_t i = led_min; i < led_max; i++) {
@@ -147,6 +147,17 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         }
 
         // Override active RGB effect with solid green
+        return true;
+    } else if (top == LAYER_RAISE) {
+        // Purple = hue 180°, full saturation, keep current brightness
+        hsv_t hsv = {.h = 180, .s = 255, .v = rgb_matrix_get_val()};
+        rgb_t rgb = hsv_to_rgb(hsv);
+
+        for (uint8_t i = led_min; i < led_max; i++) {
+            rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
+        }
+
+        // Override active RGB effect with solid purple
         return true;
     }
 
