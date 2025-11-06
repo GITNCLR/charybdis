@@ -74,10 +74,9 @@
 #endif
 #define SPLIT_LAYER_STATE_ENABLE
 
-/* Auto Mouse Settings */
-
+// --- Auto Mouse Settings ---
 #ifdef POINTING_DEVICE_ENABLE
-// Enable automatic mouse movement when on the pointer layer.
+// Enable automatic pointer layer on mouse movement.
 #    define POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #endif // POINTING_DEVICE_ENABLE
 

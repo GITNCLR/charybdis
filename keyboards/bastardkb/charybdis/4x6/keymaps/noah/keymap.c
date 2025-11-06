@@ -130,12 +130,10 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         rgb_t rgb = hsv_to_rgb(hsv);
 
         for (uint8_t i = led_min; i < led_max; i++) {
-            // Paint every LED; if you only want key LEDs, wrap this in:
-            // if (HAS_FLAGS(g_led_config.flags[i], LED_FLAG_KEYLIGHT)) { ... }
             rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
         }
 
-        // Return true to fully override the active RGB effect with solid white.
+        // Override active RGB effect with solid White.
         return true;
     } else if (top == LAYER_LOWER) {
         // Blue = hue 169°, full saturation, keep current brightness
@@ -146,7 +144,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
             rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
         }
 
-        // Override active RGB effect with solid green
+        // Override active RGB effect with solid Blue
         return true;
     } else if (top == LAYER_RAISE) {
         // Purple = hue 180°, full saturation, keep current brightness
@@ -157,11 +155,11 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
             rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
         }
 
-        // Override active RGB effect with solid purple
+        // Override active RGB effect with solid Purple
         return true;
     }
 
-    // Not on the pointer layer → don’t interfere with effects/other indicators
+    // If no layer matched, reset to default RGB effect (Set in config.h)
     return false;
 }
 #endif // RGB_MATRIX_ENABLE
