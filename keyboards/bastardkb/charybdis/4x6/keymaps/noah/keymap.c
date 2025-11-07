@@ -161,7 +161,21 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
     return true;
 }
-#endif // RGB_MATRIX_ENABLE
+
+#    ifdef POINTING_DEVICE_ENABLE
+// Reset idle timer on any pointing-device activity and wake RGB if needed
+report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+    if (mouse_report.x || mouse_report.y || mouse_report.h || mouse_report.v || mouse_report.buttons) {
+        rgb_idle_timer = timer_read32();
+        if (!rgb_matrix_was_enabled) {
+            rgb_matrix_enable_noeeprom();
+            rgb_matrix_was_enabled = true;
+        }
+    }
+    return mouse_report;
+}
+#    endif // POINTING_DEVICE_ENABLE
+#endif     // RGB_MATRIX_ENABLE
 
 #ifdef RGB_MATRIX_ENABLE
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
