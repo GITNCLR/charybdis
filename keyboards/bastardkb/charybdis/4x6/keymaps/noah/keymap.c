@@ -163,21 +163,37 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     return false;
 }
 
-void matrix_scan_user(void) {
-    static uint32_t last_activity_time = 0;
-    static bool     leds_off           = false;
+static uint32_t key_timer;               // timer for last keyboard activity, use 32bit value and function to make longer idle time possible
+static void     refresh_rgb(void);       // refreshes the activity timer and RGB, invoke whenever any activity happens
+static void     check_rgb_timeout(void); // checks if enough time has passed for RGB to timeout
+bool            is_rgb_timeout = false;  // store if RGB has timed out or not in a boolean
 
-    // Update activity timer on any key press or mouse movement
-    if (matrix_has_changed() || (layer_state & (1 << LAYER_POINTER))) {
-        last_activity_time = timer_read32();
-        leds_off           = false;
-        rgb_matrix_set_suspend_state(false);
-    }
-
-    // Check if 10 minutes (600000ms) have passed without activity
-    if (!leds_off && timer_elapsed32(last_activity_time) > 6000) {
-        leds_off = true;
-        rgb_matrix_set_suspend_state(true);
+void refresh_rgb(void) {
+    key_timer = timer_read32(); // store time of last refresh
+    if (is_rgb_timeout) {
+        is_rgb_timeout = false;
+        rgblight_wakeup();
     }
 }
+void check_rgb_timeout(void) {
+    if (!is_rgb_timeout && timer_elapsed32(key_timer) > RGBLIGHT_TIMEOUT) // check if RGB has already timeout and if enough time has passed
+    {
+        rgblight_suspend();
+        is_rgb_timeout = true;
+    }
+}
+/* Then, call the above functions from QMK's built in post processing functions like so */
+/* Runs at the end of each scan loop, check if RGB timeout has occurred or not */
+void housekeeping_task_user(void) {
+#    ifdef RGBLIGHT_TIMEOUT
+    check_rgb_timeout();
+#    endif
+}
+/* Runs after each key press, check if activity occurred */
+void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
+#    ifdef RGBLIGHT_TIMEOUT
+    if (record->event.pressed) refresh_rgb();
+#    endif
+}
+
 #endif // RGB_MATRIX_ENABLE
