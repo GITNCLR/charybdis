@@ -122,12 +122,6 @@ void pointing_device_init_user(void) {
 
 #ifdef RGB_MATRIX_ENABLE
 
-report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
-    if (mouse_report.x || mouse_report.y || mouse_report.h || mouse_report.v || mouse_report.buttons) {
-        rgb_matrix_enable_noeeprom();
-    }
-    return mouse_report;
-}
 // ------------------------------------------------------------
 // RGB Matrix per-layer indicators
 // ------------------------------------------------------------
