@@ -86,9 +86,5 @@
 #define AUTO_MOUSE_TIME 1200 // milliseconds
 
 // --- RGB Matrix Idle Timeout ---
-// #define RGB_MATRIX_IDLE_TIMEOUT_MIN 20 // minutes
-
 #define RGB_MATRIX_TIMEOUT 10000 // number of milliseconds to wait until rgb automatically turns off
-
-#define SPLIT_POINTING_ENABLE
-#define POINTING_DEVICE_COMBINED
+#define SPLIT_ACTIVITY_ENABLE
