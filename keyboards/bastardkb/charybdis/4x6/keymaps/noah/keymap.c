@@ -121,54 +121,6 @@ void pointing_device_init_user(void) {
 #endif // POINTING_DEVICE_ENABLE
 
 #ifdef RGB_MATRIX_ENABLE
-// ------------------------------------------------------------
-// RGB Matrix idle timeout
-// Turns off RGB Matrix after inactivity and restores it on key press or mouse movement.
-// ------------------------------------------------------------
-
-static uint32_t rgb_idle_timer         = 0;
-static bool     rgb_matrix_was_enabled = true;
-
-void matrix_scan_user(void) {
-    // Initialize timer once
-    if (rgb_idle_timer == 0) {
-        rgb_idle_timer = timer_read32();
-    }
-
-    const uint32_t timeout_ms = (uint32_t)RGB_MATRIX_IDLE_TIMEOUT_MIN * 60000u; // minutes -> ms
-    if (timer_elapsed32(rgb_idle_timer) >= timeout_ms) {
-        if (rgb_matrix_was_enabled) {
-            rgb_matrix_disable_noeeprom();
-            rgb_matrix_was_enabled = false;
-        }
-        // Reset timer so we don't repeatedly call disable
-        rgb_idle_timer = timer_read32();
-    }
-}
-
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    if (record->event.pressed) {
-        // Reset idle timer and re-enable RGB Matrix if it was disabled
-        rgb_idle_timer = timer_read32();
-        if (!rgb_matrix_was_enabled) {
-            rgb_matrix_enable_noeeprom();
-            rgb_matrix_was_enabled = true;
-        }
-    }
-    return true;
-}
-
-// Reset idle timer on any pointing-device activity and wake RGB if needed
-report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
-    if (mouse_report.x || mouse_report.y || mouse_report.h || mouse_report.v || mouse_report.buttons) {
-        rgb_idle_timer = timer_read32();
-        if (!rgb_matrix_was_enabled) {
-            rgb_matrix_enable_noeeprom();
-            rgb_matrix_was_enabled = true;
-        }
-    }
-    return mouse_report;
-}
 
 // ------------------------------------------------------------
 // RGB Matrix per-layer indicators
