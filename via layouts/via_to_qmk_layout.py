@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-VENDOR_JSON = Path("charybdis.layout.json")
+VENDOR_JSON = Path("test.charybdis.layout.json")
 
 # Mapping: index in LAYOUT(...) -> index in vendor (60-key) layer
 LAYOUT_FROM_VENDOR_INDEX = [
