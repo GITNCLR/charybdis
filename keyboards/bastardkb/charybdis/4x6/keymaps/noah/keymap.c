@@ -276,7 +276,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         rgb_matrix_set_color(CAPS_LED, 0, 255, 0);
     } else {
         // Caps OFF → keep the layer color
-        rgb_matrix_set_color(CAPS_LED, base_rgb.r, base_rgb.g, base_rgb.b);
+        rgb_matrix_set_color(CAPS_LED, 0, 255, 0);
     }
 
     return true;
