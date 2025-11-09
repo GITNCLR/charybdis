@@ -120,36 +120,32 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     switch (keycode) {
         case MACRO_0:
-            // {+KC_LGUI} {-KC_LGUI}
-            // Just tap LGUI
-            SEND_STRING(SS_TAP(X_LGUI));
+            // Spotlight Shortcut: Gui+Space
+            SEND_STRING(SS_DOWN(X_LGUI) SS_TAP(X_SPACE) SS_UP(X_LGUI));
             return false;
 
         case MACRO_1:
-            // {+KC_LALT} {-KC_LALT}
-            SEND_STRING(SS_TAP(X_LALT));
+            // ChatGPT Shortcut: Alt+Space
+            SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_SPACE) SS_UP(X_LALT));
             return false;
 
         case MACRO_2:
-            // {+KC_LALT}{+KC_LGUI} {-KC_LALT}{-KC_LGUI}
-            // Alt+Gui chord (no extra key)
-            SEND_STRING(SS_DOWN(X_LALT) SS_DOWN(X_LGUI) SS_UP(X_LGUI) SS_UP(X_LALT));
+            // Terminal Shortcut: Alt+Gui+Space
+            SEND_STRING(SS_DOWN(X_LALT) SS_DOWN(X_LGUI) SS_TAP(X_SPACE) SS_UP(X_LGUI) SS_UP(X_LALT));
             return false;
 
         case MACRO_3:
-            // {+KC_LCTL}{+KC_LALT}{+KC_LGUI}c{-KC_LCTL}{-KC_LALT}{-KC_LGUI}
-            // Ctrl+Alt+Gui+C
+            // OCR copy on macOS
             SEND_STRING(SS_LCTL(SS_LALT(SS_LGUI("c"))));
             return false;
 
         case MACRO_4:
-            // Ctrl+Alt+Gui+X (same pattern)
+            // Screenshot on macOS
             SEND_STRING(SS_LCTL(SS_LALT(SS_LGUI("x"))));
             return false;
 
         case MACRO_10:
-            // {KC_LCTL,KC_LGUI,KC_SPC}
-            // chord Ctrl+Gui+Space
+            // macOS Emoji picker
             SEND_STRING(SS_DOWN(X_LCTL) SS_DOWN(X_LGUI) SS_TAP(X_SPACE) SS_UP(X_LGUI) SS_UP(X_LCTL));
             return false;
     }

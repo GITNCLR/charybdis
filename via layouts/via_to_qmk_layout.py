@@ -81,6 +81,23 @@ REPLACEMENTS = {
     "MACRO(13)": "MACRO_13",
     "MACRO(14)": "MACRO_14",
     "MACRO(15)": "MACRO_15",
+    
+    "CUSTOM(64)": "MACRO_0",
+    "CUSTOM(65)": "MACRO_1",
+    "CUSTOM(66)": "MACRO_2",
+    "CUSTOM(67)": "MACRO_3",
+    "CUSTOM(68)": "MACRO_4",
+    "CUSTOM(69)": "MACRO_5",
+    "CUSTOM(70)": "MACRO_6",
+    "CUSTOM(71)": "MACRO_7",
+    "CUSTOM(72)": "MACRO_8",
+    "CUSTOM(73)": "MACRO_9",
+    "CUSTOM(74)": "MACRO_10",
+    "CUSTOM(75)": "MACRO_11",
+    "CUSTOM(76)": "MACRO_12",
+    "CUSTOM(77)": "MACRO_13",
+    "CUSTOM(78)": "MACRO_14",
+    "CUSTOM(79)": "MACRO_15",
 }
 
 def apply_replacements(token: str) -> str:
