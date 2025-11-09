@@ -255,7 +255,7 @@
       "KC_MS_BTN3",
       "KC_NO",
       "KC_NO",
-      "KC_RALT",
+      "CUSTOM(4)",
       "KC_NO",
       "KC_MS_BTN8",
       "KC_MS_BTN2",

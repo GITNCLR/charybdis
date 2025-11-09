@@ -24,7 +24,7 @@ enum charybdis_keymap_layers {
 };
 
 /** \brief Automatically enable sniping-mode on the pointer layer. */
-// #define CHARYBDIS_AUTO_SNIPING_ON_LAYER LAYER_POINTER
+#define CHARYBDIS_AUTO_SNIPING_ON_LAYER LAYER_RAISE
 
 #define LOWER MO(LAYER_LOWER)
 #define RAISE MO(LAYER_RAISE)
