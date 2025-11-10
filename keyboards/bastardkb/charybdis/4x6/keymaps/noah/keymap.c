@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
-
+#include "rgb_helpers.h"
 // ------------------------------------------------------------
 // Keymap Layers & Custom Keycodes
 // ------------------------------------------------------------
@@ -233,79 +233,9 @@ bool is_mouse_record_user(uint16_t keycode, keyrecord_t *record) {
  * 29–55 → right half
  */
 
-// Led Groups
+// LED Groups
 static const uint8_t layer_raise_mods[] = {33, 18};
 static const uint8_t layer_lower_mods[] = {4, 47};
-
-// ------------------------------------------------------------
-// Side awareness helpers
-// ------------------------------------------------------------
-static inline bool led_is_left(uint8_t index) {
-    return index < 29;
-}
-static inline bool led_is_right(uint8_t index) {
-    return (index >= 29 && index <= 55);
-}
-
-// This tells us which physical half we are running on at runtime.
-static inline bool this_is_left_half(void) {
-    return is_keyboard_left();
-}
-
-// ------------------------------------------------------------
-// Core LED helpers
-// ------------------------------------------------------------
-
-static inline void set_led_rgb(uint8_t index, uint8_t r, uint8_t g, uint8_t b) {
-    if (index >= RGB_MATRIX_LED_COUNT) return;
-
-    // 🔸 Filter: only act on LEDs belonging to this half
-    if (this_is_left_half()) {
-        if (!led_is_left(index)) return;
-    } else {
-        if (!led_is_right(index)) return;
-    }
-
-    rgb_matrix_set_color(index, r, g, b);
-}
-
-// Set a single LED to one color
-static inline void set_led_color(uint8_t index, rgb_t color) {
-    set_led_rgb(index, color.r, color.g, color.b);
-}
-
-// Set a list of arbitrary LEDs (e.g. {7, 9, 1}) to one color
-static inline void set_led_group(const uint8_t *indices, uint8_t count, rgb_t color) {
-    for (uint8_t i = 0; i < count; i++) {
-        set_led_color(indices[i], color);
-    }
-}
-
-// Fill a range of LEDs [from, to) with one color
-static inline void fill_led_range(uint8_t from, uint8_t to, rgb_t color) {
-    if (from >= RGB_MATRIX_LED_COUNT) return;
-    if (to > RGB_MATRIX_LED_COUNT) to = RGB_MATRIX_LED_COUNT;
-
-    for (uint8_t i = from; i < to; i++) {
-        set_led_color(i, color);
-    }
-}
-
-// Convenience wrappers for whole halves
-static inline void set_left_side(rgb_t color) {
-    for (uint8_t i = 0; i < 29; i++)
-        set_led_color(i, color);
-}
-
-static inline void set_right_side(rgb_t color) {
-    for (uint8_t i = 29; i <= 55; i++)
-        set_led_color(i, color);
-}
-
-static inline void set_both_sides(rgb_t color) {
-    set_left_side(color);
-    set_right_side(color);
-}
 
 // ------------------------------------------------------------
 // RGB Matrix per-layer indicators
@@ -321,19 +251,21 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
 
     switch (top) {
         case LAYER_POINTER: {
-            hsv_t hsv = {.h = 0, .s = 0, .v = 75};
+            hsv_t hsv = (hsv_t){.h = 0, .s = 0, .v = 75};
             set_both_sides(hsv_to_rgb(hsv));
+
             set_led_group(layer_raise_mods, sizeof(layer_raise_mods), hsv_to_rgb((hsv_t){.h = 180, .s = 255, .v = current_brightness}));
+
             set_led_group(layer_lower_mods, sizeof(layer_lower_mods), hsv_to_rgb((hsv_t){.h = 169, .s = 255, .v = current_brightness}));
         } break;
 
         case LAYER_LOWER: {
-            hsv_t hsv = {.h = 169, .s = 255, .v = current_brightness};
+            hsv_t hsv = (hsv_t){.h = 169, .s = 255, .v = current_brightness};
             set_both_sides(hsv_to_rgb(hsv));
         } break;
 
         case LAYER_RAISE: {
-            hsv_t hsv = {.h = 180, .s = 255, .v = current_brightness};
+            hsv_t hsv = (hsv_t){.h = 180, .s = 255, .v = current_brightness};
             set_both_sides(hsv_to_rgb(hsv));
         } break;
     }
