@@ -1,31 +1,9 @@
-/**
- * Copyright 2021 Charly Delay <charly@codesink.dev> (@0xcharly)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 #include QMK_KEYBOARD_H
 #include "rgb_helpers.h"
-// ------------------------------------------------------------
-// Keymap Layers & Custom Keycodes
-// ------------------------------------------------------------
-enum charybdis_keymap_layers {
-    LAYER_BASE = 0,
-    LAYER_LOWER,
-    LAYER_RAISE,
-    LAYER_POINTER,
-};
 
+// ------------------------------------------------------------
+// Custom Keycodes & Keymap Layers
+// ------------------------------------------------------------
 enum custom_keycodes {
     MACRO_0 = SAFE_RANGE,
     MACRO_1,
@@ -43,6 +21,13 @@ enum custom_keycodes {
     MACRO_13,
     MACRO_14,
     MACRO_15,
+};
+
+enum charybdis_keymap_layers {
+    LAYER_BASE = 0,
+    LAYER_LOWER,
+    LAYER_RAISE,
+    LAYER_POINTER,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -237,6 +222,17 @@ bool is_mouse_record_user(uint16_t keycode, keyrecord_t *record) {
 static const uint8_t layer_raise_mods[] = {33, 18};
 static const uint8_t layer_lower_mods[] = {4, 47};
 
+// ─── RGB HELPER SUMMARY ─────────────────────────────────────────────
+// set_led_color(i, color)        → set single LED by index (side-aware)
+// set_led_group(list, n, color)  → set non-contiguous LEDs
+// fill_led_range(from, to, col)  → fill continuous LED range
+// set_left_side(color)           → color all left-side LEDs
+// set_right_side(color)          → color all right-side LEDs
+// set_both_sides(color)          → color all LEDs on both halves
+//
+// Use this for color: hsv_to_rgb((hsv_t){.h = 180, .s = 255, .v = current_brightness})
+// ───────────────────────────────────────────────────────────────────
+
 // ------------------------------------------------------------
 // RGB Matrix per-layer indicators
 // ------------------------------------------------------------
@@ -253,9 +249,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         case LAYER_POINTER: {
             hsv_t hsv = (hsv_t){.h = 0, .s = 0, .v = 75};
             set_both_sides(hsv_to_rgb(hsv));
-
             set_led_group(layer_raise_mods, sizeof(layer_raise_mods), hsv_to_rgb((hsv_t){.h = 180, .s = 255, .v = current_brightness}));
-
             set_led_group(layer_lower_mods, sizeof(layer_lower_mods), hsv_to_rgb((hsv_t){.h = 169, .s = 255, .v = current_brightness}));
         } break;
 

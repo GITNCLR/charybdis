@@ -2,13 +2,6 @@
 
 #ifdef RGB_MATRIX_ENABLE
 
-// We assume QMK_KEYBOARD_H (or quantum.h) has already been included
-// in the file that includes this header, so we have:
-// - rgb_matrix_set_color
-// - RGB_MATRIX_LED_COUNT
-// - is_keyboard_left()
-// - rgb_t, hsv_t, hsv_to_rgb, etc.
-
 // ------------------------------------------------------------
 // Side awareness helpers
 // ------------------------------------------------------------
