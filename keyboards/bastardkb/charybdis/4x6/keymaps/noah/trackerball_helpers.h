@@ -65,11 +65,11 @@ static inline report_mouse_t handle_volume_mode(report_mouse_t mouse_report) {
 
         vol_acc += dy;
         while (vol_acc >= VOLUME_THRESHOLD) {
-            tap_code(KC_AUDIO_VOLU);
+            tap_code(KC_AUDIO_VOL_UP);
             vol_acc -= VOLUME_THRESHOLD;
         }
         while (vol_acc <= -VOLUME_THRESHOLD) {
-            tap_code(KC_AUDIO_VOLD);
+            tap_code(KC_AUDIO_VOL_DOWN);
             vol_acc += VOLUME_THRESHOLD;
         }
     }
