@@ -16,27 +16,39 @@
  */
 #pragma once
 
+/* ────────────────────────────────
+ * Core / feature toggles
+ * ──────────────────────────────── */
 #ifdef VIA_ENABLE
-/* VIA configuration. */
+#    undef DYNAMIC_KEYMAP_LAYER_COUNT
 #    define DYNAMIC_KEYMAP_LAYER_COUNT 4
-#endif // VIA_ENABLE
+#endif
 
 #ifndef __arm__
-/* Disable unused features. */
+/* Save space on non-ARM builds. */
 #    define NO_ACTION_ONESHOT
-#endif // __arm__
-
-// --- RGB Brightness cap ---
-#ifdef RGBLIGHT_LIMIT_VAL
-#    undef RGBLIGHT_LIMIT_VAL
 #endif
-#define RGBLIGHT_LIMIT_VAL 150
 
-#ifdef LED_MATRIX_MAXIMUM_BRIGHTNESS
-#    undef LED_MATRIX_MAXIMUM_BRIGHTNESS
+/* ────────────────────────────────
+ * RGB Matrix configuration
+ * ──────────────────────────────── */
+#ifdef RGB_MATRIX_LED_COUNT
+#    undef RGB_MATRIX_LED_COUNT
 #endif
-#define LED_MATRIX_MAXIMUM_BRIGHTNESS 150
+#define RGB_MATRIX_LED_COUNT 58 // Total LEDs
 
+#ifdef RGB_MATRIX_SPLIT
+#    undef RGB_MATRIX_SPLIT
+#endif
+#define RGB_MATRIX_SPLIT {29, 29} // Left, Right
+
+/* Keep per-layer sync across halves. */
+#ifdef SPLIT_LAYER_STATE_ENABLE
+#    undef SPLIT_LAYER_STATE_ENABLE
+#endif
+#define SPLIT_LAYER_STATE_ENABLE
+
+/* Brightness (cap + default). */
 #ifdef RGB_MATRIX_MAXIMUM_BRIGHTNESS
 #    undef RGB_MATRIX_MAXIMUM_BRIGHTNESS
 #endif
@@ -47,12 +59,7 @@
 #endif
 #define RGB_MATRIX_DEFAULT_VAL RGB_MATRIX_MAXIMUM_BRIGHTNESS
 
-#ifdef LED_MATRIX_DEFAULT_VAL
-#    undef LED_MATRIX_DEFAULT_VAL
-#endif
-#define LED_MATRIX_DEFAULT_VAL LED_MATRIX_MAXIMUM_BRIGHTNESS
-
-// --- Default mode/color (solid red) ---
+/* Default solid red. */
 #ifdef RGB_MATRIX_DEFAULT_MODE
 #    undef RGB_MATRIX_DEFAULT_MODE
 #endif
@@ -61,40 +68,27 @@
 #ifdef RGB_MATRIX_DEFAULT_HUE
 #    undef RGB_MATRIX_DEFAULT_HUE
 #endif
-#define RGB_MATRIX_DEFAULT_HUE 0
+#define RGB_MATRIX_DEFAULT_HUE 0 // Red
 
 #ifdef RGB_MATRIX_DEFAULT_SAT
 #    undef RGB_MATRIX_DEFAULT_SAT
 #endif
-#define RGB_MATRIX_DEFAULT_SAT 255
+#define RGB_MATRIX_DEFAULT_SAT 255 // Full saturation
 
-// --- Split layer state for syncing RGB Per Layer between both sides ---
-#ifdef SPLIT_LAYER_STATE_ENABLE
-#    undef SPLIT_LAYER_STATE_ENABLE
-#endif
-#define SPLIT_LAYER_STATE_ENABLE
+/* Idle timeout + split-side activity wake. */
+#define RGB_MATRIX_TIMEOUT 900000 // ms before auto-off
+#define SPLIT_ACTIVITY_ENABLE
 
-// --- Auto Mouse Settings ---
+/* ────────────────────────────────
+ * Pointing device / auto-mouse
+ * ──────────────────────────────── */
 #ifdef POINTING_DEVICE_ENABLE
-// Enable automatic pointer layer on mouse movement.
+/* Auto pointer layer on movement + 16-bit motion reports. */
 #    define POINTING_DEVICE_AUTO_MOUSE_ENABLE
-#endif // POINTING_DEVICE_ENABLE
+#    define MOUSE_EXTENDED_REPORT
+#endif
 
 #ifdef AUTO_MOUSE_TIME
 #    undef AUTO_MOUSE_TIME
 #endif
-#define AUTO_MOUSE_TIME 1200 // milliseconds
-
-// --- RGB Matrix Idle Timeout ---
-#define RGB_MATRIX_TIMEOUT 900000 // number of milliseconds to wait until rgb automatically turns off
-#define SPLIT_ACTIVITY_ENABLE
-
-#ifdef RGB_MATRIX_LED_COUNT
-#    undef RGB_MATRIX_LED_COUNT
-#endif
-#define RGB_MATRIX_LED_COUNT 58 // total number (example)
-
-#ifdef RGB_MATRIX_SPLIT
-#    undef RGB_MATRIX_SPLIT
-#endif
-#define RGB_MATRIX_SPLIT {29, 29} // left, right
+#define AUTO_MOUSE_TIME 1200 // ms to switch back after movement

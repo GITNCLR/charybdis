@@ -1,5 +1,6 @@
 #include QMK_KEYBOARD_H
 #include "rgb_helpers.h"
+#include "trackerball_helpers.h"
 
 // ------------------------------------------------------------
 // Custom Keycodes & Keymap Layers
@@ -21,6 +22,8 @@ enum custom_keycodes {
     MACRO_13,
     MACRO_14,
     MACRO_15,
+    VOLMODE,
+    CARET_MODE,
 };
 
 enum charybdis_keymap_layers {
@@ -55,9 +58,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤ ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
          MT(MOD_LSFT,KC_CAPS),          XXXXXXX,          XXXXXXX,          XXXXXXX,          XXXXXXX,           XXXXXXX,              XXXXXXX,           XXXXXXX,           KC_LBRC,           KC_RBRC,        S(KC_QUOT),           KC_PEQL,
   // ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤ ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-                 MACRO_5,           MACRO_3,           MACRO_4,           XXXXXXX,           XXXXXXX,           XXXXXXX,              XXXXXXX,           XXXXXXX,        S(KC_LBRC),        S(KC_RBRC),           XXXXXXX,           XXXXXXX,
+                  MACRO_5,           MACRO_3,           MACRO_4,           XXXXXXX,           XXXXXXX,           XXXXXXX,              XXXXXXX,           XXXXXXX,        S(KC_LBRC),        S(KC_RBRC),           XXXXXXX,           XXXXXXX,
   // ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤ ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-                                                                           KC_LGUI,            KC_SPC,        KC_MS_BTN8,           KC_VOLD,           KC_VOLU,
+                                                                           KC_LGUI,            KC_SPC,        KC_MS_BTN8,           XXXXXXX,           XXXXXXX,
                                                                                                 MO(1),           KC_BSPC,           KC_BSPC
   //                                                                    ╰────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────╯
   ),
@@ -85,7 +88,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤ ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
          MT(MOD_LSFT,KC_CAPS),          XXXXXXX,          XXXXXXX,          XXXXXXX,          _______,           XXXXXXX,              XXXXXXX,           XXXXXXX,        KC_MS_BTN3,           XXXXXXX,        KC_MS_BTN3,           XXXXXXX,
   // ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤ ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-                  XXXXXXX,           XXXXXXX,           XXXXXXX,           XXXXXXX,           XXXXXXX,           XXXXXXX,              SNP_TOG,        KC_MS_BTN1,        KC_MS_BTN2,        KC_MS_BTN8,           _______,           KC_RALT,
+                  XXXXXXX,           XXXXXXX,           XXXXXXX,           XXXXXXX,           XXXXXXX,           XXXXXXX,              VOLMODE,        KC_MS_BTN1,        KC_MS_BTN2,        KC_MS_BTN8,           _______,        CARET_MODE,
   // ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤ ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
                                                                            KC_LGUI,           XXXXXXX,        KC_MS_BTN8,           KC_LALT,            KC_ENT,
                                                                                               XXXXXXX,           XXXXXXX,           KC_BSPC
@@ -98,40 +101,53 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // Macros
 // ------------------------------------------------------------
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    // --- 1) Hold-type keys (react on press + release) ---
+    switch (keycode) {
+        case VOLMODE:
+            volmode_active = record->event.pressed;
+            if (!volmode_active) {
+                vol_acc      = 0;
+                vol_last_dir = 0;
+            }
+            return false;
+
+        case CARET_MODE:
+            caret_active = record->event.pressed;
+            if (!caret_active) {
+                dominant_axis = '\0';
+            }
+            return false;
+    }
+
+    // --- 2) Ignore releases for everything else ---
     if (!record->event.pressed) {
-        // Only act on key press
         return true;
     }
 
+    // --- 3) Macros (press-only) ---
     switch (keycode) {
-        case MACRO_0:
-            // Spotlight Shortcut: Gui+Space
-            SEND_STRING(SS_DOWN(X_LGUI) SS_TAP(X_SPACE) SS_UP(X_LGUI));
+        case MACRO_0: // Spotlight: GUI + Space
+            SEND_STRING(SS_LGUI(SS_TAP(X_SPACE)));
             return false;
 
-        case MACRO_1:
-            // ChatGPT Shortcut: Alt+Space
-            SEND_STRING(SS_DOWN(X_LALT) SS_TAP(X_SPACE) SS_UP(X_LALT));
+        case MACRO_1: // ChatGPT: Alt + Space
+            SEND_STRING(SS_LALT(SS_TAP(X_SPACE)));
             return false;
 
-        case MACRO_2:
-            // Terminal Shortcut: Alt+Gui+Space
-            SEND_STRING(SS_DOWN(X_LALT) SS_DOWN(X_LGUI) SS_TAP(X_SPACE) SS_UP(X_LGUI) SS_UP(X_LALT));
+        case MACRO_2: // Terminal: Alt + GUI + Space
+            SEND_STRING(SS_LALT(SS_LGUI(SS_TAP(X_SPACE))));
             return false;
 
-        case MACRO_3:
-            // OCR copy on macOS
+        case MACRO_3: // OCR copy on macOS: Ctrl + Alt + GUI + C
             SEND_STRING(SS_LCTL(SS_LALT(SS_LGUI("c"))));
             return false;
 
-        case MACRO_4:
-            // Screenshot on macOS
+        case MACRO_4: // Screenshot on macOS: Ctrl + Alt + GUI + X
             SEND_STRING(SS_LCTL(SS_LALT(SS_LGUI("x"))));
             return false;
 
-        case MACRO_5:
-            // macOS Emoji picker
-            SEND_STRING(SS_DOWN(X_LCTL) SS_DOWN(X_LGUI) SS_TAP(X_SPACE) SS_UP(X_LGUI) SS_UP(X_LCTL));
+        case MACRO_5: // Emoji picker: Ctrl + GUI + Space
+            SEND_STRING(SS_LCTL(SS_LGUI(SS_TAP(X_SPACE))));
             return false;
     }
 
@@ -141,16 +157,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 // ------------------------------------------------------------
 // Pointing Device Stuff
 // ------------------------------------------------------------
-#ifndef POINTING_DEVICE_ENABLE
-#    define DRGSCRL KC_NO
-#    define DPI_MOD KC_NO
-#    define S_D_MOD KC_NO
-#    define SNIPING KC_NO
-#endif // !POINTING_DEVICE_ENABLE
-
 #ifdef POINTING_DEVICE_ENABLE
 
-// Automatically enable sniping-mode on the pointer layer.
+// Automatically enable sniping-mode on the chosen layer.
 #    define CHARYBDIS_AUTO_SNIPING_ON_LAYER LAYER_RAISE
 
 #    ifdef CHARYBDIS_AUTO_SNIPING_ON_LAYER
@@ -191,6 +200,21 @@ bool is_mouse_record_user(uint16_t keycode, keyrecord_t *record) {
             return true;
     }
     return false;
+}
+
+report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+    // Volume mode (held custom key) has top priority
+    if (volmode_active) {
+        return handle_volume_mode(mouse_report);
+    }
+    // Caret mode (held custom key) has second priority
+    else if (caret_active) {
+        return handle_caret_mode(mouse_report);
+    }
+    // Default: pass through unchanged
+    else {
+        return mouse_report;
+    }
 }
 #endif // POINTING_DEVICE_ENABLE
 

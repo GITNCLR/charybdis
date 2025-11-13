@@ -2,7 +2,8 @@
 import json
 from pathlib import Path
 
-VENDOR_JSON = Path("charybdis.layout.json")
+SCRIPT_DIR = Path(__file__).resolve().parent
+VENDOR_JSON = SCRIPT_DIR / "charybdis.layout.json"
 
 # Mapping: index in LAYOUT(...) -> index in vendor (60-key) layer
 LAYOUT_FROM_VENDOR_INDEX = [
@@ -98,6 +99,9 @@ REPLACEMENTS = {
     "CUSTOM(77)": "MACRO_13",
     "CUSTOM(78)": "MACRO_14",
     "CUSTOM(79)": "MACRO_15",
+    
+    "CUSTOM(80)": "VOLMODE",
+    "CUSTOM(81)": "CARET_MODE",
 }
 
 def apply_replacements(token: str) -> str:
