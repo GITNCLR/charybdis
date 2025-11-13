@@ -98,3 +98,5 @@
 #    undef RGB_MATRIX_SPLIT
 #endif
 #define RGB_MATRIX_SPLIT {29, 29} // left, right
+
+#define MOUSE_EXTENDED_REPORT
