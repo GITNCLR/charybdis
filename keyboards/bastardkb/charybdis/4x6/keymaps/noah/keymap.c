@@ -273,8 +273,8 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         case LAYER_POINTER: {
             hsv_t hsv = (hsv_t){.h = 0, .s = 0, .v = 75};
             set_both_sides(hsv_to_rgb(hsv));
-            set_led_group(layer_raise_mods, sizeof(layer_raise_mods), hsv_to_rgb((hsv_t){.h = 180, .s = 255, .v = current_brightness}));
-            set_led_group(layer_lower_mods, sizeof(layer_lower_mods), hsv_to_rgb((hsv_t){.h = 169, .s = 255, .v = current_brightness}));
+            //            set_led_group(layer_raise_mods, sizeof(layer_raise_mods), hsv_to_rgb((hsv_t){.h = 180, .s = 255, .v = current_brightness}));
+            //            set_led_group(layer_lower_mods, sizeof(layer_lower_mods), hsv_to_rgb((hsv_t){.h = 169, .s = 255, .v = current_brightness}));
         } break;
 
         case LAYER_LOWER: {
