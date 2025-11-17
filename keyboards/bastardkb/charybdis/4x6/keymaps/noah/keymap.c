@@ -198,6 +198,10 @@ bool is_mouse_record_user(uint16_t keycode, keyrecord_t *record) {
         case SNIPING_MODE_TOGGLE:
             // Treat SNIPING as a mouse key so it WON'T deactivate the auto mouse layer
             return true;
+
+        case DRAGSCROLL_MODE:
+            // Treat DRAGSCROLL as a mouse key so it WON'T deactivate the auto mouse layer
+            return true;
     }
     return false;
 }
