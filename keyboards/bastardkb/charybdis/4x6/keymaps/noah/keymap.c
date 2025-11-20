@@ -100,10 +100,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // ------------------------------------------------------------
 // Macros
 // ------------------------------------------------------------
-
-// How long you have to hold before it becomes the "shifted" symbol (ms)
-
-// Simple timer for our tap/hold keys
 static uint16_t tap_hold_timer;
 
 static void send_shifted_symbol(uint16_t keycode) {
@@ -182,7 +178,7 @@ static void send_shifted_symbol(uint16_t keycode) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    // --- 1) Hold-type keys (react on press + release), unchanged ---
+    // --- 1) Hold-type keys (react on press + release) ---
     switch (keycode) {
         case VOLMODE:
             volmode_active = record->event.pressed;
@@ -200,7 +196,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
     }
 
-    // --- 2) Tap/Hold symbol & number keys (like custom Auto Shift) ---
+    // --- 2) Tap/Hold symbol & number keys (Custom Auto Shift) ---
     switch (keycode) {
         case KC_1:
         case KC_2:
@@ -238,12 +234,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false; // fully handled
     }
 
-    // --- 3) Ignore releases for everything else (your existing behavior) ---
+    // --- 3) Ignore releases for everything else ---
     if (!record->event.pressed) {
         return true;
     }
 
-    // --- 4) Macros (press-only), unchanged ---
+    // --- 4) Macros (press-only) ---
     switch (keycode) {
         case MACRO_0: // Spotlight: GUI + Space
             SEND_STRING(SS_LGUI(SS_TAP(X_SPACE)));

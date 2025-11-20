@@ -109,4 +109,7 @@
 #define CHARYBDIS_SCROLL_STEP_DIVISOR 10
 #define CHARYBDIS_SCROLL_MAX_STEP 1
 
+/* ────────────────────────────────
+ * Tap/Hold timing
+ * ──────────────────────────────── */
 #define CUSTOM_TAP_HOLD_TERM 180
