@@ -276,17 +276,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 // Automatically enable sniping-mode on the chosen layer.
 #    define CHARYBDIS_AUTO_SNIPING_ON_LAYER LAYER_RAISE
-
 #    ifdef CHARYBDIS_AUTO_SNIPING_ON_LAYER
 layer_state_t layer_state_set_user(layer_state_t state) {
     charybdis_set_pointer_sniping_enabled(layer_state_cmp(state, CHARYBDIS_AUTO_SNIPING_ON_LAYER));
 
-    // Manage Auto Mouse enabling/disabling based on layer
+    // Manage Auto Mouse enabling/disabling based on layer to avoid conflicts with sniping
     uint8_t layer = get_highest_layer(state);
 
     switch (layer) {
         case LAYER_RAISE:
-            set_auto_mouse_enable(false); // disable Auto Mouse
+            set_auto_mouse_enable(false); // disable Auto Mouse when in sniping layer
             break;
 
         default:
@@ -299,8 +298,8 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
 #    ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
 void pointing_device_init_user(void) {
-    set_auto_mouse_layer(LAYER_POINTER); // use your pointer layer
-    set_auto_mouse_enable(true);         // MUST be enabled to work
+    set_auto_mouse_layer(LAYER_POINTER); // set default pointer layer
+    set_auto_mouse_enable(true);         // enable Auto Mouse by default
 }
 #    endif // POINTING_DEVICE_AUTO_MOUSE_ENABLE
 
@@ -326,11 +325,11 @@ bool is_mouse_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
-    // Volume mode (held custom key) has top priority
+    // Volume mode (held custom key)
     if (volmode_active) {
         return handle_volume_mode(mouse_report);
     }
-    // Caret mode (held custom key) has second priority
+    // Caret mode (held custom key)
     else if (caret_active) {
         return handle_caret_mode(mouse_report);
     }
@@ -357,8 +356,8 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
  * ├────────────────────────┤                 ├────────────────────────┤
  *    3   4  11  12  19  23                     52  48  41  40  33  32
  * ╰────────────────────────╯                 ╰────────────────────────╯
- *                       26  27  28     53  54
- *                           25  24     55
+ *                       26  27  28     53  54  XX
+ *                           25  24     55  XX
  *                     ╰────────────╯ ╰────────────╯
  *
  * 0–28  → left half

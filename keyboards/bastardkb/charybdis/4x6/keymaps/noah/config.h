@@ -1,19 +1,3 @@
-/**
- * Copyright 2021 Charly Delay <charly@codesink.dev> (@0xcharly)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 #pragma once
 
 /* ────────────────────────────────
@@ -30,54 +14,69 @@
 #endif
 
 /* ────────────────────────────────
+ * Sync-specific features
+ * ──────────────────────────────── */
+
+/* Keep layer state in sync across halves */
+#ifdef SPLIT_LAYER_STATE_ENABLE
+#    undef SPLIT_LAYER_STATE_ENABLE
+#endif
+#define SPLIT_LAYER_STATE_ENABLE
+
+/* Keep activity state in sync for rgb matrix timeout */
+#ifdef SPLIT_ACTIVITY_ENABLE
+#    undef SPLIT_ACTIVITY_ENABLE
+#endif
+#define SPLIT_ACTIVITY_ENABLE
+
+/* ────────────────────────────────
  * RGB Matrix configuration
  * ──────────────────────────────── */
 #ifdef RGB_MATRIX_LED_COUNT
 #    undef RGB_MATRIX_LED_COUNT
 #endif
-#define RGB_MATRIX_LED_COUNT 58 // Total LEDs
+#define RGB_MATRIX_LED_COUNT 58 // Total LEDs (2 dummy LEDs on pointer side)
 
 #ifdef RGB_MATRIX_SPLIT
 #    undef RGB_MATRIX_SPLIT
 #endif
 #define RGB_MATRIX_SPLIT {29, 29} // Left, Right
 
-/* Keep per-layer sync across halves. */
-#ifdef SPLIT_LAYER_STATE_ENABLE
-#    undef SPLIT_LAYER_STATE_ENABLE
-#endif
-#define SPLIT_LAYER_STATE_ENABLE
-
-/* Brightness (cap + default). */
+/* Brightness Cap to protect the LEDS from drawing too much power. */
 #ifdef RGB_MATRIX_MAXIMUM_BRIGHTNESS
 #    undef RGB_MATRIX_MAXIMUM_BRIGHTNESS
 #endif
 #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150
 
-#ifdef RGB_MATRIX_DEFAULT_VAL
-#    undef RGB_MATRIX_DEFAULT_VAL
-#endif
-#define RGB_MATRIX_DEFAULT_VAL RGB_MATRIX_MAXIMUM_BRIGHTNESS
-
-/* Default solid red. */
+/* Default solid color mode. */
 #ifdef RGB_MATRIX_DEFAULT_MODE
 #    undef RGB_MATRIX_DEFAULT_MODE
 #endif
 #define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_SOLID_COLOR
 
+// H
 #ifdef RGB_MATRIX_DEFAULT_HUE
 #    undef RGB_MATRIX_DEFAULT_HUE
 #endif
 #define RGB_MATRIX_DEFAULT_HUE 0 // Red
 
+// S
 #ifdef RGB_MATRIX_DEFAULT_SAT
 #    undef RGB_MATRIX_DEFAULT_SAT
 #endif
 #define RGB_MATRIX_DEFAULT_SAT 255 // Full saturation
 
-/* Idle timeout + split-side activity wake. */
-#define RGB_MATRIX_TIMEOUT 900000 // ms before auto-off
-#define SPLIT_ACTIVITY_ENABLE
+// V
+#ifdef RGB_MATRIX_DEFAULT_VAL
+#    undef RGB_MATRIX_DEFAULT_VAL
+#endif
+#define RGB_MATRIX_DEFAULT_VAL RGB_MATRIX_MAXIMUM_BRIGHTNESS
+
+/* RGB Matrix timeout/sleep */
+#ifdef RGB_MATRIX_TIMEOUT
+#    undef RGB_MATRIX_TIMEOUT
+#endif
+#define RGB_MATRIX_TIMEOUT 900000 // ms before auto-off, requires SPLIT_ACTIVITY_ENABLE to stay in sync across halves
 
 /* ────────────────────────────────
  * Pointing device / auto-mouse
@@ -91,7 +90,7 @@
 #ifdef AUTO_MOUSE_TIME
 #    undef AUTO_MOUSE_TIME
 #endif
-#define AUTO_MOUSE_TIME 1200 // ms to switch back after movement
+#define AUTO_MOUSE_TIME 1200 // ms to switch back after movement or mouse key activity
 
 /* ────────────────────────────────
  * Scroll configuration
