@@ -43,6 +43,7 @@ static uint16_t automouse_rgb_last_activity = 0;
 static bool     automouse_rgb_armed         = false;
 #    ifdef SPLIT_TRANSACTION_IDS_USER
 static automouse_rgb_packet_t automouse_rgb_remote = {0};
+static automouse_rgb_packet_t automouse_rgb_last_sent = {0};
 #    endif
 
 static inline bool automouse_rgb_is_enabled(void) {
@@ -140,8 +141,21 @@ static inline automouse_rgb_packet_t automouse_rgb_local_packet(void) {
 }
 
 #    ifdef SPLIT_TRANSACTION_IDS_USER
+static inline automouse_rgb_packet_t automouse_rgb_seed_packet(void) {
+    uint16_t timeout = automouse_rgb_timeout();
+    return (automouse_rgb_packet_t){
+        .remaining = timeout,
+        .timeout   = timeout,
+        .flags     = AUTOMOUSE_RGB_FLAG_ARMED,
+    };
+}
+
 static inline void automouse_rgb_broadcast(const automouse_rgb_packet_t *pkt) {
+    if (memcmp(&automouse_rgb_last_sent, pkt, sizeof(automouse_rgb_packet_t)) == 0) {
+        return;
+    }
     transaction_rpc_send(PUT_AUTOMOUSE_RGB, sizeof(*pkt), pkt);
+    automouse_rgb_last_sent = *pkt;
 }
 
 static inline void automouse_rgb_slave_rpc(uint8_t initiator2target_buffer_size, const void *initiator2target_buffer, uint8_t target2initiator_buffer_size, void *target2initiator_buffer) {
@@ -154,6 +168,11 @@ static inline void automouse_rgb_slave_rpc(uint8_t initiator2target_buffer_size,
 }
 
 static inline void automouse_rgb_post_init(void) {
+    automouse_rgb_remote    = automouse_rgb_seed_packet();
+    automouse_rgb_last_sent = (automouse_rgb_packet_t){0};
+    if (is_keyboard_master()) {
+        automouse_rgb_broadcast(&automouse_rgb_remote);
+    }
     transaction_register_rpc(PUT_AUTOMOUSE_RGB, automouse_rgb_slave_rpc);
 }
 #    else
