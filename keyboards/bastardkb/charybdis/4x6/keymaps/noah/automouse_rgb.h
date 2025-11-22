@@ -5,20 +5,8 @@
 #    include <string.h>
 #    include "pointing_device_auto_mouse.h"
 #    include "rgb_helpers.h"
-#    ifdef SPLIT_TRANSACTION_IDS_USER
-#        include "transactions.h"
-#    endif
-
-typedef struct __attribute__((packed)) {
-    uint16_t remaining;
-    uint16_t timeout;
-    uint8_t  flags;
-} automouse_rgb_packet_t;
-
 #    define AUTOMOUSE_RGB_FLAG_LOCKED 0x01
 #    define AUTOMOUSE_RGB_FLAG_ARMED 0x02
-
-static automouse_rgb_packet_t automouse_rgb_remote = {0};
 
 // Utility to paint every LED regardless of half (master computes the whole frame).
 static inline void automouse_rgb_set_all(rgb_t color) {
@@ -88,6 +76,9 @@ static inline void automouse_rgb_track_layer_state(layer_state_t state) {
 
 // Called from pointing_device_task_user so we mirror the auto-mouse timer resets.
 static inline void automouse_rgb_track_pointing(report_mouse_t mouse_report) {
+    if (!is_keyboard_master()) {
+        return;
+    }
     if (!automouse_rgb_is_enabled()) {
         return;
     }
@@ -137,34 +128,9 @@ static inline automouse_rgb_packet_t automouse_rgb_local_packet(void) {
 }
 
 #    ifdef SPLIT_TRANSACTION_IDS_USER
-static inline void automouse_rgb_sync_from_slave(void) {
-    if (!is_keyboard_master()) {
-        return;
-    }
-    automouse_rgb_packet_t pkt = {0};
-    if (transaction_rpc_recv(PUT_AUTOMOUSE_RGB, sizeof(pkt), &pkt)) {
-        automouse_rgb_remote = pkt;
-    }
-}
-
-static inline void automouse_rgb_slave_rpc(uint8_t initiator2target_buffer_size, const void *initiator2target_buffer, uint8_t target2initiator_buffer_size, void *target2initiator_buffer) {
-    (void)initiator2target_buffer_size;
-    (void)initiator2target_buffer;
-    if (target2initiator_buffer_size < sizeof(automouse_rgb_packet_t)) {
-        return;
-    }
-    automouse_rgb_packet_t pkt = automouse_rgb_local_packet();
-    memcpy(target2initiator_buffer, &pkt, sizeof(pkt));
-}
-
-static inline void automouse_rgb_post_init(void) {
-    transaction_register_rpc(PUT_AUTOMOUSE_RGB, automouse_rgb_slave_rpc);
-}
+static inline void automouse_rgb_post_init(void) {}
 #    else
-static inline void automouse_rgb_sync_from_slave(void) {
-}
-static inline void automouse_rgb_post_init(void) {
-}
+static inline void automouse_rgb_post_init(void) {}
 #    endif
 
 // Render a simple gradient countdown on the entire board. Returns true when it handled the layer.
@@ -173,17 +139,12 @@ static inline bool automouse_rgb_render(uint8_t top_layer) {
         return false;
     }
 
-    automouse_rgb_sync_from_slave();
+    if (!is_keyboard_master()) {
+        // Only master renders; split RGB pushes the frame.
+        return false;
+    }
 
     automouse_rgb_packet_t pkt = automouse_rgb_local_packet();
-
-    // If the master has stale data but the slave has a fresh timer, use the remote copy.
-    if (is_keyboard_master()) {
-        bool remote_fresher = (automouse_rgb_remote.flags & AUTOMOUSE_RGB_FLAG_ARMED) && (!automouse_rgb_armed || automouse_rgb_remote.remaining > pkt.remaining);
-        if (remote_fresher) {
-            pkt = automouse_rgb_remote;
-        }
-    }
 
     uint16_t remaining  = pkt.remaining;
     uint16_t timeout    = pkt.timeout ? pkt.timeout : automouse_rgb_timeout();
