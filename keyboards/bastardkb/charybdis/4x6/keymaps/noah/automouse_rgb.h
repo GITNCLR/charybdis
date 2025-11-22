@@ -8,6 +8,12 @@
 #    define AUTOMOUSE_RGB_FLAG_LOCKED 0x01
 #    define AUTOMOUSE_RGB_FLAG_ARMED 0x02
 
+typedef struct __attribute__((packed)) {
+    uint16_t remaining;
+    uint16_t timeout;
+    uint8_t  flags;
+} automouse_rgb_packet_t;
+
 // Utility to paint every LED regardless of half (master computes the whole frame).
 static inline void automouse_rgb_set_all(rgb_t color) {
     for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
@@ -127,11 +133,7 @@ static inline automouse_rgb_packet_t automouse_rgb_local_packet(void) {
     return p;
 }
 
-#    ifdef SPLIT_TRANSACTION_IDS_USER
 static inline void automouse_rgb_post_init(void) {}
-#    else
-static inline void automouse_rgb_post_init(void) {}
-#    endif
 
 // Render a simple gradient countdown on the entire board. Returns true when it handled the layer.
 static inline bool automouse_rgb_render(uint8_t top_layer) {
