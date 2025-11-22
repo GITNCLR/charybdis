@@ -73,8 +73,8 @@ static inline void automouse_rgb_track_layer_state(layer_state_t state) {
 
 // Called from pointing_device_task_user so we mirror the auto-mouse timer resets.
 static inline void automouse_rgb_track_pointing(report_mouse_t mouse_report) {
-    if (this_is_left_half()) {
-        // No sensor on the non-pointer side.
+    if (!is_keyboard_master()) {
+        // Only master sees the live pointing data.
         return;
     }
 
@@ -117,8 +117,8 @@ static inline uint16_t automouse_rgb_time_remaining(void) {
 
 // Render a simple gradient countdown on the entire board. Returns true when it handled the layer.
 static inline bool automouse_rgb_render(uint8_t top_layer) {
-    if (this_is_left_half()) {
-        // Let the pointer side drive the whole frame to avoid stale timers on the non-pointer half.
+    if (!is_keyboard_master()) {
+        // Only the master should paint to avoid stale timers overriding the fresh frame.
         return false;
     }
 
